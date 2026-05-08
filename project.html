@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOLESTEP — Air Phantom X1</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f8f6f2;
+      --accent: #e84a2f;
+      --accent-dark: #b83520;
+      --muted: #8a8680;
+      --border: rgba(10,10,10,0.1);
+      --bg: #f8f6f2;
+      --card: #ffffff;
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--black);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--black);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw;
+      height: 60px;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-weight: 900; font-size: 1.6rem;
+      letter-spacing: 0.08em;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(248,246,242,0.6); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-icons { display: flex; gap: 1.2rem; align-items: center; }
+    .nav-icon {
+      width: 20px; height: 20px; cursor: pointer;
+      color: rgba(248,246,242,0.7); transition: color 0.2s;
+    }
+    .nav-icon:hover { color: var(--white); }
+    .cart-badge {
+      background: var(--accent); color: white;
+      font-size: 0.6rem; font-weight: 700;
+      border-radius: 50%; width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin-left: -8px; margin-top: -10px;
+    }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      padding: 1rem 5vw;
+      font-size: 0.75rem; color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    .breadcrumb span { margin: 0 0.4rem; }
+
+    /* ── MAIN PRODUCT LAYOUT ── */
+    .product-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 5vw 4rem;
+    }
+
+    /* ── GALLERY ── */
+    .gallery { position: sticky; top: 80px; height: fit-content; padding-right: 3rem; }
+
+    .gallery-main {
+      position: relative;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .gallery-main img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94);
+    }
+    .gallery-main:hover img { transform: scale(1.04); }
+
+    .badge-new {
+      position: absolute; top: 16px; left: 16px;
+      background: var(--accent); color: white;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 0.75rem; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px; border-radius: 4px;
+    }
+    .badge-sale {
+      position: absolute; top: 16px; right: 16px;
+      background: var(--black); color: white;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 0.75rem; letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px; border-radius: 4px;
+    }
+
+    /* Thumbnails using radio + label trick */
+    .thumbnails {
+      display: flex; gap: 10px; margin-top: 14px;
+    }
+    .thumbnails input[type="radio"] { display: none; }
+
+    .thumb-label {
+      width: 70px; height: 70px;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .thumb-label img { width: 100%; height: 100%; object-fit: cover; }
+    .thumb-label:hover { transform: translateY(-2px); border-color: var(--muted); }
+    .thumbnails input[type="radio"]:checked + .thumb-label { border-color: var(--accent); }
+
+    /* Image switching with CSS only */
+    #img1:checked ~ .gallery-main .shoe-img-1,
+    #img2:checked ~ .gallery-main .shoe-img-2,
+    #img3:checked ~ .gallery-main .shoe-img-3,
+    #img4:checked ~ .gallery-main .shoe-img-4 { display: block; }
+
+    .gallery-main img { display: none; }
+    #img1:checked ~ .gallery-main .shoe-img-1 { display: block; }
+
+    /* ── PRODUCT INFO ── */
+    .product-info { padding-left: 1rem; }
+
+    .brand-tag {
+      font-family: var(--font-display); font-weight: 600;
+      font-size: 0.75rem; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .product-title {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      line-height: 0.95; letter-spacing: -0.01em;
+      text-transform: uppercase;
+      color: var(--black);
+      margin-bottom: 6px;
+    }
+    .product-subtitle {
+      font-size: 0.9rem; color: var(--muted);
+      font-weight: 300; margin-bottom: 1.2rem;
+    }
+
+    /* Rating */
+    .rating-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 1.4rem;
+    }
+    .stars { color: #f5a623; font-size: 0.9rem; letter-spacing: 2px; }
+    .rating-count { font-size: 0.8rem; color: var(--muted); }
+    .rating-divider { color: var(--border); }
+    .verified { font-size: 0.75rem; color: #3a8a5c; font-weight: 500; }
+
+    /* Price */
+    .price-row {
+      display: flex; align-items: baseline; gap: 12px; margin-bottom: 1.6rem;
+    }
+    .price-now {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 2.4rem; color: var(--black);
+    }
+    .price-was {
+      font-size: 1rem; color: var(--muted);
+      text-decoration: line-through;
+    }
+    .price-save {
+      background: #ecf9f1; color: #3a8a5c;
+      font-size: 0.75rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 4px;
+    }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); margin: 1.4rem 0; }
+
+    /* Color Selector */
+    .option-label {
+      font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px;
+    }
+    .option-label span { color: var(--black); font-weight: 500; }
+
+    .color-options { display: flex; gap: 10px; margin-bottom: 1.6rem; }
+    .color-options input[type="radio"] { display: none; }
+    .color-swatch {
+      width: 34px; height: 34px; border-radius: 50%;
+      cursor: pointer; position: relative;
+      transition: transform 0.15s;
+      border: 3px solid transparent;
+      outline: 2px solid transparent;
+      outline-offset: 3px;
+    }
+    .color-swatch:hover { transform: scale(1.1); }
+    .color-options input[type="radio"]:checked + .color-swatch { outline-color: var(--black); }
+    .swatch-phantom { background: #0a0a0a; }
+    .swatch-ember  { background: #e84a2f; }
+    .swatch-ice    { background: #c0d4e8; }
+    .swatch-chalk  { background: #e8e4dc; border: 1px solid #ccc; }
+
+    /* Size Selector */
+    .size-options { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.6rem; }
+    .size-options input[type="radio"] { display: none; }
+    .size-btn {
+      width: 54px; height: 46px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1.5px solid var(--border);
+      border-radius: 8px; cursor: pointer;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--black);
+      transition: all 0.15s;
+      background: white;
+    }
+    .size-btn:hover { border-color: var(--black); background: #f0ede8; }
+    .size-options input[type="radio"]:checked + .size-btn {
+      background: var(--black); color: white; border-color: var(--black);
+    }
+    .size-btn.unavailable {
+      color: #ccc; border-color: #eee; cursor: not-allowed;
+      text-decoration: line-through;
+    }
+    .size-guide {
+      font-size: 0.75rem; color: var(--accent);
+      cursor: pointer; text-decoration: underline;
+      margin-left: auto;
+    }
+    .size-header { display: flex; align-items: center; margin-bottom: 10px; }
+
+    /* CTA Buttons */
+    .cta-group { display: flex; gap: 12px; margin-bottom: 1.4rem; }
+
+    .btn-cart {
+      flex: 1;
+      padding: 16px 24px;
+      background: var(--black); color: var(--white);
+      border: none; border-radius: 10px;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-cart:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,74,47,0.3);
+    }
+    .btn-cart:active { transform: translateY(0); }
+    .btn-cart.added { background: #3a8a5c; }
+
+    .btn-wishlist {
+      width: 54px; height: 54px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px; background: white;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; flex-shrink: 0;
+      color: var(--muted);
+      font-size: 1.3rem;
+    }
+    .btn-wishlist:hover { border-color: #e84a2f; color: #e84a2f; background: #fff5f3; }
+    .btn-wishlist.liked { color: #e84a2f; border-color: #e84a2f; }
+
+    .btn-buy {
+      width: 100%;
+      padding: 16px 24px;
+      background: white; color: var(--black);
+      border: 1.5px solid var(--black); border-radius: 10px;
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1rem; letter-spacing: 0.1em; text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 1.4rem;
+    }
+    .btn-buy:hover { background: var(--black); color: white; }
+
+    /* Perks */
+    .perks { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .perk {
+      flex: 1; padding: 14px 10px;
+      text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .perk:last-child { border-right: none; }
+    .perk-icon { font-size: 1.2rem; margin-bottom: 4px; }
+    .perk-label { font-size: 0.7rem; color: var(--muted); line-height: 1.3; font-weight: 400; }
+
+    /* Accordion */
+    .accordion { margin-top: 1.6rem; }
+    .accordion details { border-top: 1px solid var(--border); }
+    .accordion details:last-child { border-bottom: 1px solid var(--border); }
+    .accordion summary {
+      padding: 14px 0;
+      font-size: 0.82rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      cursor: pointer; list-style: none;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .accordion summary::after { content: "+"; font-size: 1.1rem; color: var(--muted); }
+    .accordion details[open] summary::after { content: "−"; }
+    .accordion-body {
+      font-size: 0.85rem; color: var(--muted); line-height: 1.7;
+      padding-bottom: 14px; font-weight: 300;
+    }
+    .accordion-body ul { padding-left: 1.2rem; }
+    .accordion-body li { margin-bottom: 4px; }
+
+    /* ── FEATURES SECTION ── */
+    .features-section {
+      background: var(--black); color: var(--white);
+      padding: 5rem 5vw;
+      margin-top: 2rem;
+    }
+    .features-inner {
+      max-width: 1200px; margin: 0 auto;
+    }
+    .features-eyebrow {
+      font-family: var(--font-display); font-weight: 600;
+      font-size: 0.75rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1rem;
+    }
+    .features-heading {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      text-transform: uppercase; line-height: 1;
+      margin-bottom: 3rem;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    }
+    .feature-card {
+      background: #141414;
+      padding: 2rem 1.5rem;
+      transition: background 0.2s;
+    }
+    .feature-card:hover { background: #1c1c1c; }
+    .feature-num {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: 3rem; color: rgba(232,74,47,0.3);
+      line-height: 1; margin-bottom: 0.5rem;
+    }
+    .feature-title {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: 1.1rem; text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .feature-desc {
+      font-size: 0.82rem; color: rgba(248,246,242,0.5);
+      line-height: 1.6; font-weight: 300;
+    }
+
+    /* ── REVIEWS ── */
+    .reviews-section {
+      max-width: 1200px; margin: 0 auto;
+      padding: 4rem 5vw;
+    }
+    .section-heading {
+      font-family: var(--font-display); font-weight: 900;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      text-transform: uppercase; margin-bottom: 2rem;
+    }
+    .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .review-card {
+      background: white; border-radius: 12px;
+      padding: 1.4rem;
+      border: 1px solid var(--border);
+    }
+    .review-stars { color: #f5a623; font-size: 0.8rem; margin-bottom: 8px; }
+    .review-text { font-size: 0.85rem; color: #333; line-height: 1.6; margin-bottom: 12px; font-weight: 300; }
+    .reviewer { display: flex; align-items: center; gap: 10px; }
+    .reviewer-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 700; color: white;
+    }
+    .reviewer-name { font-size: 0.8rem; font-weight: 500; }
+    .reviewer-meta { font-size: 0.7rem; color: var(--muted); }
+    .verified-badge { font-size: 0.65rem; color: #3a8a5c; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--black); color: rgba(248,246,242,0.5);
+      padding: 2rem 5vw;
+      text-align: center; font-size: 0.75rem; letter-spacing: 0.05em;
+    }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: var(--black); color: white;
+      padding: 14px 24px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 999; white-space: nowrap;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: #3a8a5c; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 860px) {
+      .product-wrapper { grid-template-columns: 1fr; padding: 0 4vw 3rem; }
+      .gallery { position: static; padding-right: 0; margin-bottom: 2rem; }
+      .features-grid { grid-template-columns: 1fr; gap: 2px; }
+      .reviews-grid { grid-template-columns: 1fr; }
+      nav { padding: 0 4vw; }
+      .nav-links { display: none; }
+    }
+    @media (max-width: 480px) {
+      .perks { flex-direction: column; }
+      .perk { border-right: none; border-bottom: 1px solid var(--border); }
+      .perk:last-child { border-bottom: none; }
+      .cta-group { flex-direction: column; }
+      .btn-wishlist { width: 100%; height: 54px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#"><span>SOLE</span>STEP</a>
+  <ul class="nav-links">
+    <li><a href="#">Men</a></li>
+    <li><a href="#">Women</a></li>
+    <li><a href="#">New Arrivals</a></li>
+    <li><a href="#">Sale</a></li>
+  </ul>
+  <div class="nav-icons">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <div style="display:flex;align-items:flex-start">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      <div class="cart-badge" id="cartCount">2</div>
+    </div>
+  </div>
+</nav>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  Home <span>›</span> Men <span>›</span> Running <span>›</span> <strong>Air Phantom X1</strong>
+</div>
+
+<!-- PRODUCT -->
+<div class="product-wrapper">
+
+  <!-- GALLERY (CSS-only switching) -->
+  <div class="gallery">
+    <input type="radio" name="gallery" id="img1" checked/>
+    <input type="radio" name="gallery" id="img2"/>
+    <input type="radio" name="gallery" id="img3"/>
+    <input type="radio" name="gallery" id="img4"/>
+
+    <div class="gallery-main">
+      <span class="badge-new">New</span>
+      <span class="badge-sale">−20%</span>
+      <img class="shoe-img-1" src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80" alt="Air Phantom X1 - Front"/>
+      <img class="shoe-img-2" src="https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=800&q=80" alt="Air Phantom X1 - Side"/>
+      <img class="shoe-img-3" src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=800&q=80" alt="Air Phantom X1 - Detail"/>
+      <img class="shoe-img-4" src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&q=80" alt="Air Phantom X1 - Back"/>
+    </div>
+
+    <div class="thumbnails">
+      <label for="img1" class="thumb-label">
+        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=200&q=80" alt="View 1"/>
+      </label>
+      <label for="img2" class="thumb-label">
+        <img src="https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=200&q=80" alt="View 2"/>
+      </label>
+      <label for="img3" class="thumb-label">
+        <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=200&q=80" alt="View 3"/>
+      </label>
+      <label for="img4" class="thumb-label">
+        <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200&q=80" alt="View 4"/>
+      </label>
+    </div>
+  </div>
+
+  <!-- PRODUCT INFO -->
+  <div class="product-info">
+    <p class="brand-tag">Solestep Performance</p>
+    <h1 class="product-title">Air<br/>Phantom X1</h1>
+    <p class="product-subtitle">Ultralight Running Sneaker — Carbon Plate Edition</p>
+
+    <div class="rating-row">
+      <span class="stars">★★★★★</span>
+      <span style="font-size:0.85rem;font-weight:500">4.9</span>
+      <span class="rating-count">(312 reviews)</span>
+      <span class="rating-divider">|</span>
+      <span class="verified">✓ Verified Brand</span>
+    </div>
+
+    <div class="price-row">
+      <span class="price-now">₹7,999</span>
+      <span class="price-was">₹9,999</span>
+      <span class="price-save">Save ₹2,000</span>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Color Selector -->
+    <div class="option-label">Color — <span id="colorName">Phantom Black</span></div>
+    <div class="color-options">
+      <input type="radio" name="color" id="c1" value="Phantom Black" checked onchange="document.getElementById('colorName').textContent=this.value"/>
+      <label for="c1" class="color-swatch swatch-phantom" title="Phantom Black"></label>
+      <input type="radio" name="color" id="c2" value="Ember Red" onchange="document.getElementById('colorName').textContent=this.value"/>
+      <label for="c2" class="color-swatch swatch-ember" title="Ember Red"></label>
+      <input type="radio" name="color" id="c3" value="Ice Blue" onchange="document.getElementById('colorName').textContent=this.value"/>
+      <label for="c3" class="color-swatch swatch-ice" title="Ice Blue"></label>
+      <input type="radio" name="color" id="c4" value="Chalk White" onchange="document.getElementById('colorName').textContent=this.value"/>
+      <label for="c4" class="color-swatch swatch-chalk" title="Chalk White"></label>
+    </div>
+
+    <!-- Size Selector -->
+    <div class="size-header">
+      <div class="option-label" style="margin:0">Size (UK)</div>
+      <span class="size-guide" style="font-size:0.72rem;margin-left:auto">Size Guide →</span>
+    </div>
+    <div class="size-options" style="margin-top:10px">
+      <input type="radio" name="size" id="s6"/><label for="s6" class="size-btn">6</label>
+      <input type="radio" name="size" id="s7"/><label for="s7" class="size-btn">7</label>
+      <input type="radio" name="size" id="s8" checked/><label for="s8" class="size-btn">8</label>
+      <input type="radio" name="size" id="s9"/><label for="s9" class="size-btn">9</label>
+      <input type="radio" name="size" id="s10"/><label for="s10" class="size-btn">10</label>
+      <input type="radio" name="size" id="s11"/><label for="s11" class="size-btn size-btn-na">11</label>
+      <input type="radio" name="size" id="s12" disabled/><label for="s12" class="size-btn unavailable">12</label>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CTAs -->
+    <div class="cta-group">
+      <button class="btn-cart" id="cartBtn" onclick="addToCart()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Add to Cart
+      </button>
+      <button class="btn-wishlist" id="wishBtn" onclick="toggleWish()" title="Add to Wishlist">♡</button>
+    </div>
+
+    <button class="btn-buy" onclick="showToast('Redirecting to checkout...')">Buy Now — ₹7,999</button>
+
+    <!-- Perks -->
+    <div class="perks">
+      <div class="perk">
+        <div class="perk-icon">🚚</div>
+        <div class="perk-label">Free Delivery<br/>on orders ₹999+</div>
+      </div>
+      <div class="perk">
+        <div class="perk-icon">↩️</div>
+        <div class="perk-label">30-Day<br/>Free Returns</div>
+      </div>
+      <div class="perk">
+        <div class="perk-icon">🛡️</div>
+        <div class="perk-label">1-Year<br/>Warranty</div>
+      </div>
+      <div class="perk">
+        <div class="perk-icon">💳</div>
+        <div class="perk-label">0% EMI<br/>Available</div>
+      </div>
+    </div>
+
+    <!-- Accordion -->
+    <div class="accordion">
+      <details open>
+        <summary>Product Description</summary>
+        <div class="accordion-body">
+          The Air Phantom X1 redefines what a running sneaker can be. Engineered with a full-length carbon fibre plate, it provides explosive energy return for every stride. The breathable knit upper wraps your foot like a second skin, while the Phantom Foam midsole absorbs impact without adding weight.
+        </div>
+      </details>
+      <details>
+        <summary>Key Specifications</summary>
+        <div class="accordion-body">
+          <ul>
+            <li>Weight: 218g (UK 9)</li>
+            <li>Midsole: Phantom Foam™ (Full-length)</li>
+            <li>Plate: Full Carbon Fibre</li>
+            <li>Upper: 3D Knit Breathable Mesh</li>
+            <li>Outsole: Continental Rubber</li>
+            <li>Drop: 8mm heel-to-toe</li>
+            <li>Best for: Road Running, Race Day</li>
+          </ul>
+        </div>
+      </details>
+      <details>
+        <summary>Shipping & Returns</summary>
+        <div class="accordion-body">
+          Orders are dispatched within 24 hours. Free standard delivery on all orders above ₹999. Express 1-day delivery available for ₹199. Returns accepted within 30 days — shoes must be unworn. Initiate returns directly from your account dashboard.
+        </div>
+      </details>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES SECTION -->
+<div class="features-section">
+  <div class="features-inner">
+    <p class="features-eyebrow">Why it's different</p>
+    <h2 class="features-heading">Built for<br/>Speed</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-num">01</div>
+        <div class="feature-title">Carbon Fibre Plate</div>
+        <div class="feature-desc">Full-length carbon fibre plate delivers maximum propulsion and energy transfer with every push-off.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">02</div>
+        <div class="feature-title">Phantom Foam™</div>
+        <div class="feature-desc">Our proprietary midsole foam offers 40% more energy return than standard EVA foam, without the extra weight.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-num">03</div>
+        <div class="feature-title">3D Knit Upper</div>
+        <div class="feature-desc">Engineered zone-by-zone for support where you need it, breathability where you don't. No seams, no friction.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWS -->
+<div class="reviews-section">
+  <h2 class="section-heading">What Runners Say</h2>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"These are absolutely insane for race day. Knocked 4 minutes off my half marathon PB on first try. The carbon plate is something else."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#e84a2f">RK</div>
+        <div>
+          <div class="reviewer-name">Rahul K.</div>
+          <div class="reviewer-meta">Verified Purchase · Mumbai <span class="verified-badge">✓</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Worth every rupee. The fit is perfect right out of the box — no break-in needed. Looks stunning too, got compliments at the park."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#3a8a5c">PM</div>
+        <div>
+          <div class="reviewer-name">Priya M.</div>
+          <div class="reviewer-meta">Verified Purchase · Bengaluru <span class="verified-badge">✓</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★☆</div>
+      <p class="review-text">"Delivery was super fast, packed really well. The shoes are incredibly light. Only wish they came in a half size — sized up by 0.5 and it's fine."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar" style="background:#185fa5">AS</div>
+        <div>
+          <div class="reviewer-name">Arjun S.</div>
+          <div class="reviewer-meta">Verified Purchase · Delhi <span class="verified-badge">✓</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 SOLESTEP. All rights reserved. &nbsp;|&nbsp; <a href="#">Privacy</a> &nbsp;|&nbsp; <a href="#">Terms</a> &nbsp;|&nbsp; <a href="#">Contact</a></p>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-dot"></div>
+  <span id="toastMsg">Added to cart!</span>
+</div>
+
+<script>
+  let cartCount = 2;
+  let wished = false;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function addToCart() {
+    cartCount++;
+    document.getElementById('cartCount').textContent = cartCount;
+    const btn = document.getElementById('cartBtn');
+    btn.classList.add('added');
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Added!`;
+    showToast('Air Phantom X1 added to cart 🛒');
+    setTimeout(() => {
+      btn.classList.remove('added');
+      btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> Add to Cart`;
+    }, 2000);
+  }
+
+  function toggleWish() {
+    wished = !wished;
+    const btn = document.getElementById('wishBtn');
+    btn.classList.toggle('liked', wished);
+    btn.textContent = wished ? '♥' : '♡';
+    showToast(wished ? 'Saved to Wishlist ♥' : 'Removed from Wishlist');
+  }
+</script>
+</body>
+</html>
